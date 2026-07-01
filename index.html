@@ -2,419 +2,509 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Компас — платформа адаптации | Алабуга Политех</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#0F2E42;
-    --slate:#1B3F51;
-    --line:#6FA8B5;
-    --paper:#F4F7F5;
-    --amber:#E8A33D;
-    --ink:#12232B;
-    --ok:#6FBF8B;
-    --radius:14px;
+    --navy:#0A2230; --slate:#14374A; --line:#6FA8B5; --line-dim:rgba(111,168,181,0.26);
+    --paper:#F2F6F3; --paper-dim:rgba(242,246,243,0.66);
+    --amber:#E8A33D; --amber-dim:rgba(232,163,61,0.13);
+    --stamp:#C4593B; --ink:#12232B; --ok:#6FBF8B;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  html,body{height:100%;}
-  body{
-    background:var(--navy);
-    color:var(--paper);
-    font-family:'IBM Plex Sans', sans-serif;
-    min-height:100vh;
-    position:relative;
-    overflow-x:hidden;
-  }
-  /* blueprint grid background */
-  body::before{
-    content:"";
-    position:fixed; inset:0;
+  body{background:var(--navy); color:var(--paper); font-family:'IBM Plex Sans', sans-serif; min-height:100vh; -webkit-font-smoothing:antialiased;}
+  body::before{content:""; position:fixed; inset:0;
     background-image:
-      linear-gradient(rgba(111,168,181,0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(111,168,181,0.08) 1px, transparent 1px);
-    background-size:32px 32px;
-    pointer-events:none;
-    z-index:0;
-  }
-  .wrap{position:relative; z-index:1; max-width:920px; margin:0 auto; padding:0 20px 80px;}
+      linear-gradient(rgba(111,168,181,0.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(111,168,181,0.055) 1px, transparent 1px),
+      linear-gradient(rgba(111,168,181,0.11) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(111,168,181,0.11) 1px, transparent 1px);
+    background-size:8px 8px, 8px 8px, 40px 40px, 40px 40px; pointer-events:none; z-index:0;}
+  .wrap{position:relative; z-index:1; max-width:960px; margin:0 auto; padding:0 20px 90px;}
 
-  header{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:24px 0 18px;
-    border-bottom:1px solid rgba(111,168,181,0.25);
-    margin-bottom:8px;
-  }
-  .logo{display:flex; align-items:center; gap:10px;}
-  .logo-mark{width:34px; height:34px; flex-shrink:0;}
-  .logo-text{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.15rem; letter-spacing:0.02em;}
-  .logo-sub{font-family:'IBM Plex Mono', monospace; font-size:0.62rem; color:var(--line); letter-spacing:0.08em; text-transform:uppercase;}
-  .points{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.78rem;
-    background:rgba(232,163,61,0.14);
-    border:1px solid rgba(232,163,61,0.4);
-    color:var(--amber);
-    padding:6px 12px;
-    border-radius:999px;
-    white-space:nowrap;
-  }
+  .titleblock{border:1px solid var(--line-dim); border-top:2px solid var(--amber); margin-top:20px; display:grid; grid-template-columns:1.3fr 1fr 0.8fr 0.9fr;}
+  .tb-cell{padding:10px 14px; border-left:1px solid var(--line-dim);}
+  .tb-cell:first-child{border-left:none; display:flex; align-items:center; gap:10px;}
+  .tb-label{font-family:'IBM Plex Mono', monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--line); display:block; margin-bottom:2px;}
+  .tb-value{font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--paper);}
+  .logo-mark{width:26px; height:26px; flex-shrink:0;}
+  .tb-name{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.05rem;}
+  .points{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; background:var(--amber-dim); border:1px solid rgba(232,163,61,0.4); color:var(--amber); padding:5px 11px; display:inline-flex; align-items:center; gap:6px; transition:transform 0.2s ease;}
+  .points.bump{animation:bump 0.4s ease;}
+  @keyframes bump{0%{transform:scale(1);}40%{transform:scale(1.1);}100%{transform:scale(1);}}
 
-  nav{
-    display:flex; gap:4px; overflow-x:auto;
-    padding:16px 0 4px;
-    margin-bottom:20px;
-    -ms-overflow-style:none; scrollbar-width:none;
-  }
+  nav{display:flex; align-items:stretch; overflow-x:auto; margin-bottom:26px; border:1px solid var(--line-dim); border-top:none; -ms-overflow-style:none; scrollbar-width:none;}
   nav::-webkit-scrollbar{display:none;}
-  .tab{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:0.74rem;
-    letter-spacing:0.03em;
-    text-transform:uppercase;
-    color:var(--line);
-    background:transparent;
-    border:1px solid rgba(111,168,181,0.3);
-    padding:8px 14px;
-    border-radius:999px;
-    cursor:pointer;
-    white-space:nowrap;
-    transition:all 0.2s ease;
-  }
-  .tab:hover{border-color:var(--line); color:var(--paper);}
-  .tab.active{background:var(--paper); color:var(--navy); border-color:var(--paper); font-weight:500;}
+  .tab{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--line); background:transparent; border:none; border-right:1px solid var(--line-dim); padding:11px 16px; cursor:pointer; white-space:nowrap; transition:all 0.2s ease; display:flex; align-items:center; gap:8px;}
+  .tab .n{color:rgba(111,168,181,0.55); font-size:0.68rem;}
+  .tab:hover{background:rgba(111,168,181,0.06); color:var(--paper);}
+  .tab.active{background:var(--amber); color:var(--ink); font-weight:600;}
+  .tab.active .n{color:var(--ink); opacity:0.6;}
 
-  .view{display:none; animation:fadeIn 0.35s ease;}
-  .view.active{display:block;}
-  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .view{display:none;} .view.active{display:block; animation:fadeIn 0.4s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+  .sheet-label{display:flex; justify-content:space-between; align-items:baseline; font-family:'IBM Plex Mono', monospace; font-size:0.66rem; color:rgba(111,168,181,0.6); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;}
+  .hero{display:flex; flex-direction:column; gap:6px; padding:2px 0 24px;}
+  h1{font-family:'Space Grotesk', sans-serif; font-size:2.0rem; font-weight:600; line-height:1.14; max-width:600px; letter-spacing:-0.01em;}
+  .lead{color:var(--paper-dim); font-size:0.95rem; max-width:520px; margin-top:9px; line-height:1.55;}
 
-  .hero{
-    display:flex; flex-direction:column; gap:6px;
-    padding:8px 0 28px;
-  }
-  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--line); letter-spacing:0.1em; text-transform:uppercase;}
-  h1{font-family:'Space Grotesk', sans-serif; font-size:2rem; font-weight:600; line-height:1.15; max-width:600px;}
-  .lead{color:rgba(244,247,245,0.7); font-size:0.95rem; max-width:520px; margin-top:6px;}
+  .dim-line{display:flex; align-items:center; gap:8px; margin:18px 0; color:var(--line); opacity:0.55;}
+  .dim-line .l{flex:1; height:1px; background:var(--line); position:relative;}
+  .dim-line .l::before, .dim-line .l::after{content:""; position:absolute; top:-3px; width:1px; height:7px; background:var(--line);}
+  .dim-line .l::before{left:0;} .dim-line .l::after{right:0;}
+  .dim-text{font-family:'IBM Plex Mono', monospace; font-size:0.66rem; white-space:nowrap;}
 
-  .route-svg{width:100%; height:auto; margin:20px 0 8px;}
-  .route-path{
-    fill:none; stroke:var(--amber); stroke-width:2.5; stroke-linecap:round;
-    stroke-dasharray:600; stroke-dashoffset:600;
-    animation:draw 2.4s ease forwards 0.3s;
-  }
-  @keyframes draw{to{stroke-dashoffset:0;}}
+  .card{position:relative; background:var(--slate); border:1px solid var(--line-dim); padding:22px; margin-bottom:14px;}
+  .card::before, .card::after{content:""; position:absolute; width:9px; height:9px; border-color:var(--amber); opacity:0.7;}
+  .card::before{top:-1px; left:-1px; border-top:1.5px solid var(--amber); border-left:1.5px solid var(--amber);}
+  .card::after{bottom:-1px; right:-1px; border-bottom:1.5px solid var(--amber); border-right:1.5px solid var(--amber);}
+  .card h3{font-family:'Space Grotesk', sans-serif; font-size:1.05rem; font-weight:600; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;}
+  .card p{color:var(--paper-dim); font-size:0.9rem; line-height:1.55;}
+  .card-badge{font-family:'IBM Plex Mono', monospace; font-size:0.66rem; color:var(--amber); background:var(--amber-dim); padding:3px 9px; border:1px solid rgba(232,163,61,0.3);}
 
-  .card{
-    background:var(--slate);
-    border:1px solid rgba(111,168,181,0.2);
-    border-radius:var(--radius);
-    padding:20px;
-    margin-bottom:14px;
-  }
-  .card h3{font-family:'Space Grotesk', sans-serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;}
-  .card p{color:rgba(244,247,245,0.72); font-size:0.9rem; line-height:1.5;}
-
-  .checklist{display:flex; flex-direction:column; gap:0;}
-  .check-item{
-    display:flex; align-items:center; gap:12px;
-    padding:12px 0;
-    border-bottom:1px solid rgba(111,168,181,0.15);
-    cursor:pointer;
-  }
+  .checklist{display:flex; flex-direction:column;}
+  .check-item{display:flex; align-items:center; gap:14px; padding:13px 2px; border-bottom:1px solid rgba(111,168,181,0.13); cursor:pointer;}
   .check-item:last-child{border-bottom:none;}
-  .check-box{
-    width:22px; height:22px; border-radius:6px;
-    border:1.5px solid var(--line);
-    flex-shrink:0;
-    display:flex; align-items:center; justify-content:center;
-    font-size:0.75rem;
-    transition:all 0.2s ease;
-  }
-  .check-item.done .check-box{background:var(--ok); border-color:var(--ok); color:var(--navy);}
-  .check-item.done .check-label{text-decoration:line-through; color:rgba(244,247,245,0.45);}
-  .check-label{font-size:0.9rem;}
-  .check-pts{margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:0.7rem; color:var(--amber);}
+  .stamp{width:34px; height:34px; border-radius:50%; border:1.5px solid var(--line); flex-shrink:0; position:relative; display:flex; align-items:center; justify-content:center; transition:border-color 0.2s ease;}
+  .stamp svg{opacity:0; transform:scale(0.4) rotate(-25deg); transition:all 0.35s cubic-bezier(.34,1.56,.64,1);}
+  .check-item.done .stamp{border-color:var(--stamp);}
+  .check-item.done .stamp svg{opacity:1; transform:scale(1) rotate(-12deg);}
+  .check-item.done .check-label{color:rgba(242,246,243,0.42);}
+  .check-label{font-size:0.91rem;}
+  .check-pts{margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--amber);}
+  .progress-bar{height:4px; background:rgba(111,168,181,0.15); margin:14px 0 5px;}
+  .progress-fill{height:100%; background:var(--amber); transition:width 0.5s cubic-bezier(.4,1.4,.6,1); width:0%;}
 
-  .progress-bar{height:6px; background:rgba(111,168,181,0.18); border-radius:999px; overflow:hidden; margin:12px 0 4px;}
-  .progress-fill{height:100%; background:var(--amber); border-radius:999px; transition:width 0.4s ease; width:0%;}
+  .grid-2{display:grid; grid-template-columns:1fr; gap:12px;} @media(min-width:640px){.grid-2{grid-template-columns:1fr 1fr;}}
+  .grid-3{display:grid; grid-template-columns:1fr; gap:10px;} @media(min-width:640px){.grid-3{grid-template-columns:1fr 1fr 1fr;}}
+  .stat{background:rgba(111,168,181,0.05); border:1px solid var(--line-dim); padding:14px 16px;}
+  .stat-label{font-family:'IBM Plex Mono', monospace; font-size:0.64rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--line); margin-bottom:6px;}
+  .stat-val{font-family:'Space Grotesk', sans-serif; font-size:1.5rem; font-weight:600;}
+  .stat-sub{font-size:0.76rem; color:var(--paper-dim); margin-top:2px;}
 
-  .grid-2{display:grid; grid-template-columns:1fr; gap:12px;}
-  @media(min-width:640px){.grid-2{grid-template-columns:1fr 1fr;}}
+  table{width:100%; border-collapse:collapse; font-size:0.87rem;}
+  th{text-align:left; font-family:'IBM Plex Mono', monospace; font-size:0.66rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--line); padding:9px 6px; border-bottom:1px solid var(--line-dim);}
+  td{padding:12px 6px; border-bottom:1px solid rgba(111,168,181,0.1); font-family:'IBM Plex Mono', monospace; font-size:0.84rem;}
+  td:first-child{font-family:'IBM Plex Sans', sans-serif; font-size:0.87rem;}
+  tr:last-child td{border-bottom:none;} tr.next-departure{background:rgba(232,163,61,0.06);}
+  .tag{display:inline-flex; align-items:center; gap:4px; font-family:'IBM Plex Mono', monospace; font-size:0.66rem; padding:3px 8px; background:rgba(111,191,139,0.13); color:var(--ok);}
+  .tag::before{content:""; width:5px; height:5px; border-radius:50%; background:var(--ok);}
+  .tag.soon{background:var(--amber-dim); color:var(--amber);} .tag.soon::before{background:var(--amber);}
 
-  table{width:100%; border-collapse:collapse; font-size:0.86rem;}
-  th{text-align:left; font-family:'IBM Plex Mono', monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--line); padding:8px 6px; border-bottom:1px solid rgba(111,168,181,0.25);}
-  td{padding:10px 6px; border-bottom:1px solid rgba(111,168,181,0.1);}
-  .tag{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:0.68rem; padding:2px 8px; border-radius:999px; background:rgba(111,168,181,0.15); color:var(--line);}
-
-  .room-list{display:flex; flex-direction:column; gap:8px;}
-  .room-row{display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(111,168,181,0.06); border-radius:10px; font-size:0.88rem;}
-  .room-num{font-family:'IBM Plex Mono', monospace; color:var(--amber); font-weight:500;}
-
-  input[type=text], select{
-    width:100%;
-    background:rgba(244,247,245,0.06);
-    border:1px solid rgba(111,168,181,0.3);
-    color:var(--paper);
-    padding:11px 14px;
-    border-radius:10px;
-    font-family:'IBM Plex Sans', sans-serif;
-    font-size:0.92rem;
-    outline:none;
-  }
+  input[type=text], select{width:100%; background:rgba(242,246,243,0.05); border:1px solid var(--line-dim); color:var(--paper); padding:12px 14px; font-family:'IBM Plex Mono', monospace; font-size:0.88rem; outline:none; transition:border-color 0.2s ease;}
   input[type=text]:focus, select:focus{border-color:var(--amber);}
-  input[type=text]::placeholder{color:rgba(244,247,245,0.35);}
+  input[type=text]::placeholder{color:rgba(242,246,243,0.3);}
+  select{cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236FA8B5'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center;}
+  select option{background:var(--navy); color:var(--paper);}
 
-  .translate-result{
-    margin-top:14px; padding:14px 16px; background:rgba(232,163,61,0.1);
-    border:1px solid rgba(232,163,61,0.3); border-radius:10px;
-    font-size:1rem; min-height:20px;
-  }
-  .translate-result .orig{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--line); display:block; margin-top:4px;}
-
-  .btn{
-    display:inline-block;
-    background:var(--amber); color:var(--ink);
-    font-weight:600; font-size:0.9rem;
-    border:none; padding:12px 22px; border-radius:10px;
-    cursor:pointer; font-family:'IBM Plex Sans', sans-serif;
-    transition:transform 0.15s ease;
-  }
-  .btn:hover{transform:translateY(-1px);}
+  .btn{display:inline-flex; align-items:center; gap:8px; background:var(--amber); color:var(--ink); font-weight:600; font-size:0.85rem; border:none; padding:11px 20px; cursor:pointer; font-family:'IBM Plex Sans', sans-serif; transition:transform 0.15s ease, box-shadow 0.2s ease;}
+  .btn:hover{transform:translateY(-1px); box-shadow:0 6px 18px rgba(232,163,61,0.25);}
   .btn:active{transform:translateY(0);}
+  .btn-ghost{background:transparent; border:1px solid var(--line-dim); color:var(--paper);}
+  .btn-ghost:hover{border-color:var(--amber); box-shadow:none;}
 
-  .upload-zone{
-    border:1.5px dashed rgba(111,168,181,0.4);
-    border-radius:var(--radius);
-    padding:32px 20px;
-    text-align:center;
-    cursor:pointer;
-    transition:border-color 0.2s ease;
-  }
-  .upload-zone:hover{border-color:var(--amber);}
-  .upload-zone p{color:rgba(244,247,245,0.6); font-size:0.85rem; margin-top:6px;}
+  .translate-result{margin-top:15px; padding:16px 18px; background:var(--amber-dim); border:1px solid rgba(232,163,61,0.3); font-size:1.05rem; min-height:20px;}
+  .translate-result .orig{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--line); display:block; margin-top:5px;}
 
-  .comp-tag{
-    display:inline-block; margin:4px 6px 0 0; padding:6px 12px;
-    background:rgba(111,191,139,0.15); border:1px solid rgba(111,191,139,0.35);
-    color:var(--ok); border-radius:999px; font-size:0.82rem;
-  }
+  .upload-zone{border:1.5px dashed rgba(111,168,181,0.35); padding:30px 20px; text-align:center; cursor:pointer; transition:all 0.25s ease;}
+  .upload-zone:hover{border-color:var(--amber); background:rgba(232,163,61,0.04);}
+  .upload-zone p{color:var(--paper-dim); font-size:0.85rem; margin-top:8px;}
+  .comp-tag{display:inline-block; margin:4px 6px 0 0; padding:7px 13px; background:rgba(111,191,139,0.13); border:1px solid rgba(111,191,139,0.32); color:var(--ok); font-size:0.82rem; font-family:'IBM Plex Mono', monospace; animation:tagIn 0.35s ease backwards;}
+  @keyframes tagIn{from{opacity:0; transform:translateY(4px);}to{opacity:1; transform:translateY(0);}}
+  .bar-row{margin-bottom:12px;} .bar-row:last-child{margin-bottom:0;}
+  .bar-top{display:flex; justify-content:space-between; font-size:0.83rem; margin-bottom:5px;}
+  .bar-top b{font-family:'IBM Plex Mono', monospace; color:var(--amber);}
+  .bar-track{height:6px; background:rgba(111,168,181,0.15);}
+  .bar-fill{height:100%; background:var(--ok); width:0%; transition:width 0.7s cubic-bezier(.4,1.4,.6,1);}
 
-  .event-row{display:flex; gap:14px; padding:14px 0; border-bottom:1px solid rgba(111,168,181,0.15);}
+  .event-row{display:flex; gap:16px; padding:15px 2px; border-bottom:1px solid rgba(111,168,181,0.13); align-items:flex-start;}
   .event-row:last-child{border-bottom:none;}
-  .event-date{
-    font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--amber);
-    flex-shrink:0; width:56px; text-align:center; line-height:1.3; padding-top:2px;
-  }
-  .event-date b{display:block; font-size:1.1rem; font-family:'Space Grotesk', sans-serif; color:var(--paper);}
-  .event-body h4{font-size:0.92rem; font-weight:500; margin-bottom:2px;}
-  .event-body span{font-size:0.78rem; color:rgba(244,247,245,0.55);}
+  .event-date{font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--amber); flex-shrink:0; width:52px; text-align:center; line-height:1.3; padding-top:2px;}
+  .event-date b{display:block; font-size:1.15rem; font-family:'Space Grotesk', sans-serif; color:var(--paper);}
+  .event-body{flex:1;} .event-body h4{font-size:0.93rem; font-weight:500; margin-bottom:3px;}
+  .event-body span{font-size:0.79rem; color:rgba(242,246,243,0.5);}
+  .ics-btn{font-family:'IBM Plex Mono', monospace; font-size:0.68rem; background:transparent; border:1px solid var(--line-dim); color:var(--line); padding:6px 10px; cursor:pointer; white-space:nowrap; transition:all 0.2s ease; margin-top:8px;}
+  .ics-btn:hover{border-color:var(--amber); color:var(--amber);}
+  .ics-btn.added{border-color:var(--ok); color:var(--ok);}
 
-  footer{
-    text-align:center; padding-top:24px; margin-top:10px;
-    border-top:1px solid rgba(111,168,181,0.15);
-    font-family:'IBM Plex Mono', monospace; font-size:0.7rem; color:rgba(111,168,181,0.6);
+  .map-wrap{position:relative; border:1px solid var(--line-dim); background:rgba(111,168,181,0.03);}
+  .map-svg{width:100%; height:auto; display:block;}
+  .bldg{cursor:pointer;} .bldg rect, .bldg polygon{transition:fill 0.2s ease, stroke 0.2s ease;}
+  .bldg:hover rect, .bldg:hover polygon{fill:rgba(232,163,61,0.2); stroke:var(--amber);}
+  .bldg.active rect, .bldg.active polygon{fill:rgba(232,163,61,0.28); stroke:var(--amber);}
+  .bldg-label{font-family:'IBM Plex Mono', monospace; font-size:11px; fill:var(--line); pointer-events:none;}
+  .route-line{fill:none; stroke:var(--amber); stroke-width:2; stroke-linecap:round; stroke-dasharray:400; stroke-dashoffset:400; transition:stroke-dashoffset 0.6s ease;}
+  .route-line.show{stroke-dashoffset:0;}
+  .map-info{padding:16px 20px; border-top:1px solid var(--line-dim); min-height:60px;}
+  .map-info-title{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:0.98rem; margin-bottom:4px;}
+  .map-info-sub{font-size:0.85rem; color:var(--paper-dim);}
+  .route-picker{display:grid; grid-template-columns:1fr 1fr auto; gap:10px; padding:16px 20px; border-top:1px solid var(--line-dim); align-items:end;}
+  @media(max-width:560px){.route-picker{grid-template-columns:1fr; }}
+  .route-picker label{font-family:'IBM Plex Mono', monospace; font-size:0.62rem; text-transform:uppercase; color:var(--line); display:block; margin-bottom:5px;}
+
+  .room-list{display:flex; flex-direction:column;}
+  .room-row{display:flex; justify-content:space-between; align-items:center; padding:11px 4px; border-bottom:1px solid rgba(111,168,181,0.1); font-size:0.88rem;}
+  .room-row:last-child{border-bottom:none;} .room-num{font-family:'IBM Plex Mono', monospace; color:var(--amber); font-weight:500;}
+
+  footer{display:flex; justify-content:space-between; align-items:center; padding:16px 14px; margin-top:14px; border:1px solid var(--line-dim); border-bottom:2px solid var(--amber); font-family:'IBM Plex Mono', monospace; font-size:0.66rem; color:rgba(111,168,181,0.55);}
+
+  .toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--paper); color:var(--navy); padding:11px 20px; font-family:'IBM Plex Mono', monospace; font-size:0.8rem; font-weight:500; display:flex; align-items:center; gap:8px; opacity:0; pointer-events:none; z-index:50; transition:opacity 0.25s ease, transform 0.25s ease; box-shadow:0 10px 30px rgba(0,0,0,0.3);}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .toast .dot{width:7px; height:7px; border-radius:50%; background:var(--stamp);}
+
+  .modal-overlay{position:fixed; inset:0; background:rgba(6,18,26,0.85); z-index:100; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.25s ease;}
+  .modal-overlay.show{opacity:1; pointer-events:auto;}
+  .modal-box{background:var(--slate); border:1px solid var(--line-dim); border-top:2px solid var(--amber); max-width:380px; width:100%; padding:26px; position:relative; transform:translateY(10px); transition:transform 0.25s ease;}
+  .modal-overlay.show .modal-box{transform:translateY(0);}
+  .modal-box h2{font-family:'Space Grotesk', sans-serif; font-size:1.2rem; margin-bottom:8px;}
+  .modal-box p{color:var(--paper-dim); font-size:0.87rem; margin-bottom:16px; line-height:1.5;}
+
+  @media(max-width:640px){
+    h1{font-size:1.5rem;}
+    .titleblock{grid-template-columns:1fr 1fr;}
+    .tb-cell:first-child{grid-column:1 / 3;}
+    .tb-cell:nth-child(3){border-left:none;}
+    footer{flex-direction:column; align-items:flex-start; gap:6px;}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header>
-    <div class="logo">
-      <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="18" stroke="#E8A33D" stroke-width="2"/>
-        <path d="M20 8 L24 20 L20 32 L16 20 Z" fill="#E8A33D"/>
-        <circle cx="20" cy="20" r="2.5" fill="#0F2E42"/>
-      </svg>
-      <div>
-        <div class="logo-text">Компас</div>
-        <div class="logo-sub">Alabuga Politech · Onboarding</div>
-      </div>
+  <div class="titleblock">
+    <div class="tb-cell">
+      <svg class="logo-mark" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#E8A33D" stroke-width="2"/><path d="M20 8 L24 20 L20 32 L16 20 Z" fill="#E8A33D"/><circle cx="20" cy="20" r="2.5" fill="#0A2230"/></svg>
+      <span class="tb-name">Компас</span>
     </div>
-    <div class="points" id="pointsBadge">★ 0 баллов</div>
-  </header>
+    <div class="tb-cell"><span class="tb-label">Сотрудник</span><span class="tb-value" id="tbName">—</span></div>
+    <div class="tb-cell"><span class="tb-label">Лист</span><span class="tb-value" id="sheetNum">01/06</span></div>
+    <div class="tb-cell"><span class="tb-label">Баллы</span><div class="points" id="pointsBadge">★ <span id="pointsVal">0</span></div></div>
+  </div>
 
   <nav id="tabs">
-    <button class="tab active" data-view="dashboard">Дашборд</button>
-    <button class="tab" data-view="nav">Навигация</button>
-    <button class="tab" data-view="logistics">Логистика</button>
-    <button class="tab" data-view="events">Ивенты</button>
-    <button class="tab" data-view="translate">Переводчик</button>
-    <button class="tab" data-view="comp">Компетенции</button>
+    <button class="tab active" data-view="dashboard" data-n="01/06"><span class="n">01</span>Дашборд</button>
+    <button class="tab" data-view="nav" data-n="02/06"><span class="n">02</span>Навигация</button>
+    <button class="tab" data-view="logistics" data-n="03/06"><span class="n">03</span>Логистика</button>
+    <button class="tab" data-view="events" data-n="04/06"><span class="n">04</span>Ивенты</button>
+    <button class="tab" data-view="translate" data-n="05/06"><span class="n">05</span>Переводчик</button>
+    <button class="tab" data-view="comp" data-n="06/06"><span class="n">06</span>Компетенции</button>
   </nav>
 
   <!-- DASHBOARD -->
   <section class="view active" id="view-dashboard">
+    <div class="sheet-label"><span>Лист 01 — Общий вид</span><span>Компас · Онбординг</span></div>
     <div class="hero">
-      <span class="eyebrow">Добро пожаловать в Алабуга Политех</span>
-      <h1>Твой первый месяц — по шагам, а не наугад</h1>
+      <h1 id="heroTitle">Твой первый месяц — по шагам, а не наугад</h1>
       <p class="lead">Компас собирает всё, что нужно новому сотруднику на старте: маршруты, расписание, ивенты и перевод — в одном месте, с прогрессом и баллами.</p>
     </div>
 
-    <svg class="route-svg" viewBox="0 0 880 140" xmlns="http://www.w3.org/2000/svg">
-      <path class="route-path" d="M20,110 C120,110 140,30 240,30 C340,30 340,100 440,100 C540,100 540,40 640,40 C740,40 760,90 860,70" />
-      <circle cx="20" cy="110" r="5" fill="#F4F7F5"/>
-      <circle cx="240" cy="30" r="4" fill="#6FA8B5"/>
-      <circle cx="440" cy="100" r="4" fill="#6FA8B5"/>
-      <circle cx="640" cy="40" r="4" fill="#6FA8B5"/>
-      <circle cx="860" cy="70" r="5" fill="#E8A33D"/>
-    </svg>
+    <div class="grid-3" style="margin-bottom:14px;">
+      <div class="stat"><div class="stat-label">День адаптации</div><div class="stat-val" id="dayCount">1</div><div class="stat-sub" id="dayCountSub">из 21</div></div>
+      <div class="stat"><div class="stat-label">Ближайший автобус</div><div class="stat-val" id="busCountdown">—</div><div class="stat-sub">Проходная 1</div></div>
+      <div class="stat"><div class="stat-label">Прогресс адаптации</div><div class="stat-val" id="progressPct">0%</div><div class="stat-sub">чек-лист ниже</div></div>
+    </div>
+
+    <div class="dim-line"><div class="l"></div><span class="dim-text">01 → 06 · ПОЛНЫЙ МАРШРУТ АДАПТАЦИИ</span><div class="l"></div></div>
 
     <div class="card">
       <h3>Чек-лист адаптации</h3>
       <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      <p id="progressLabel" style="margin-bottom:12px;">0 из 6 пунктов выполнено</p>
-      <div class="checklist" id="checklist">
-        <div class="check-item" data-pts="10"><div class="check-box"></div><span class="check-label">Найти свой кабинет на карте</span><span class="check-pts">+10</span></div>
-        <div class="check-item" data-pts="10"><div class="check-box"></div><span class="check-label">Узнать расписание автобуса</span><span class="check-pts">+10</span></div>
-        <div class="check-item" data-pts="15"><div class="check-box"></div><span class="check-label">Посмотреть ближайшие ивенты</span><span class="check-pts">+15</span></div>
-        <div class="check-item" data-pts="10"><div class="check-box"></div><span class="check-label">Попробовать переводчик</span><span class="check-pts">+10</span></div>
-        <div class="check-item" data-pts="20"><div class="check-box"></div><span class="check-label">Пройти пересмотр компетенций</span><span class="check-pts">+20</span></div>
-        <div class="check-item" data-pts="15"><div class="check-box"></div><span class="check-label">Заполнить профиль сотрудника</span><span class="check-pts">+15</span></div>
-      </div>
+      <p id="progressLabel" style="margin-bottom:14px;">0 из 6 пунктов выполнено</p>
+      <div class="checklist" id="checklist"></div>
     </div>
 
     <div class="grid-2">
-      <div class="card"><h3>Сегодня</h3><p>Автобус от главной проходной — через 12 минут. Ближайший ивент: приветственная встреча, 15:00, Корпус А.</p></div>
+      <div class="card"><h3>Ближайший ивент</h3><p id="dashEvent">Welcome-встреча новых сотрудников — 15:00, Корпус А, актовый зал</p></div>
       <div class="card"><h3>Совет дня</h3><p>Загрузи резюме в разделе «Компетенции» — система подберёт направления развития без участия HR.</p></div>
     </div>
   </section>
 
   <!-- NAVIGATION -->
   <section class="view" id="view-nav">
-    <div class="hero" style="padding-bottom:16px;">
-      <span class="eyebrow">Навигация по территории</span>
-      <h1 style="font-size:1.6rem;">Кабинеты и корпуса</h1>
+    <div class="sheet-label"><span>Лист 02 — Навигация</span><span>М 1:500</span></div>
+    <div class="hero" style="padding-bottom:14px;"><h1 style="font-size:1.55rem;">Схема территории</h1></div>
+
+    <div class="card" style="padding:0;">
+      <div class="map-wrap">
+        <svg class="map-svg" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" id="mapSvg">
+          <g class="bldg" data-id="a" data-name="Корпус А" data-info="Ресепшн, бюро пропусков, актовый зал" data-cx="110" data-cy="85">
+            <rect x="40" y="40" width="140" height="90" fill="rgba(111,168,181,0.09)" stroke="#6FA8B5" stroke-width="1.5"/>
+            <text class="bldg-label" x="110" y="90" text-anchor="middle">А</text>
+          </g>
+          <g class="bldg" data-id="b" data-name="Корпус B" data-info="HR-отдел, конференц-залы, кабинет 214" data-cx="290" data-cy="85">
+            <rect x="220" y="40" width="140" height="90" fill="rgba(111,168,181,0.09)" stroke="#6FA8B5" stroke-width="1.5"/>
+            <text class="bldg-label" x="290" y="90" text-anchor="middle">B</text>
+          </g>
+          <g class="bldg" data-id="c" data-name="Корпус С" data-info="Столовая, зона отдыха" data-cx="470" data-cy="85">
+            <rect x="400" y="40" width="140" height="90" fill="rgba(111,168,181,0.09)" stroke="#6FA8B5" stroke-width="1.5"/>
+            <text class="bldg-label" x="470" y="90" text-anchor="middle">С</text>
+          </g>
+          <g class="bldg" data-id="d" data-name="Корпус D" data-info="Лаборатория биоматериалов, R&amp;D" data-cx="200" data-cy="215">
+            <rect x="130" y="170" width="140" height="90" fill="rgba(111,168,181,0.09)" stroke="#6FA8B5" stroke-width="1.5"/>
+            <text class="bldg-label" x="200" y="220" text-anchor="middle">D</text>
+          </g>
+          <g class="bldg" data-id="e" data-name="Проходная 1" data-info="Главный вход, точка сбора автобусов" data-cx="365" data-cy="215">
+            <polygon points="330,170 400,170 400,260 330,260" fill="rgba(232,163,61,0.1)" stroke="#E8A33D" stroke-width="1.5"/>
+            <text class="bldg-label" x="365" y="220" text-anchor="middle" style="fill:#E8A33D;">Вход</text>
+          </g>
+          <line x1="110" y1="130" x2="110" y2="170" stroke="#6FA8B5" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>
+          <line x1="290" y1="130" x2="365" y2="170" stroke="#6FA8B5" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>
+          <line x1="200" y1="170" x2="330" y2="215" stroke="#6FA8B5" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>
+          <path class="route-line" id="routeLine" d=""/>
+          <text x="20" y="290" class="bldg-label" style="font-size:9px; opacity:0.5;">М 1:500</text>
+        </svg>
+        <div class="route-picker">
+          <div><label>Откуда</label><select id="fromSelect"><option value="">Выбрать</option></select></div>
+          <div><label>Куда</label><select id="toSelect"><option value="">Выбрать</option></select></div>
+          <button class="btn" id="buildRoute" style="padding:11px 18px;">Маршрут</button>
+        </div>
+        <div class="map-info" id="mapInfo">
+          <div class="map-info-title">Выбери корпус на схеме или маршрут выше</div>
+          <div class="map-info-sub">Нажми на здание — увидишь что там; выбери "откуда/куда" — построю путь</div>
+        </div>
+      </div>
     </div>
+
     <div class="card">
       <input type="text" id="roomSearch" placeholder="Поиск кабинета, например 214 или HR" style="margin-bottom:14px;">
       <div class="room-list" id="roomList"></div>
-    </div>
-    <div class="card">
-      <h3>Карта территории</h3>
-      <p>Векторные планы зданий (DWG/PDF) загружаются от администрации Алабуга Политех и рендерятся здесь как интерактивная схема с поиском по кабинетам.</p>
     </div>
   </section>
 
   <!-- LOGISTICS -->
   <section class="view" id="view-logistics">
-    <div class="hero" style="padding-bottom:16px;">
-      <span class="eyebrow">Логистика</span>
-      <h1 style="font-size:1.6rem;">Корпоративные автобусы</h1>
-    </div>
+    <div class="sheet-label"><span>Лист 03 — Логистика</span><span id="todayDate">—</span></div>
+    <div class="hero" style="padding-bottom:14px;"><h1 style="font-size:1.55rem;">Корпоративные автобусы</h1></div>
     <div class="card">
-      <table>
-        <thead><tr><th>Маршрут</th><th>Отправление</th><th>Статус</th></tr></thead>
-        <tbody>
-          <tr><td>Центр — Проходная 1</td><td>07:40</td><td><span class="tag">по расписанию</span></td></tr>
-          <tr><td>Центр — Проходная 1</td><td>08:10</td><td><span class="tag">по расписанию</span></td></tr>
-          <tr><td>Общежития — Корпус А</td><td>08:00</td><td><span class="tag">по расписанию</span></td></tr>
-          <tr><td>Центр — Проходная 1</td><td>18:20</td><td><span class="tag">по расписанию</span></td></tr>
-        </tbody>
-      </table>
+      <table><thead><tr><th>Маршрут</th><th>Отправление</th><th>Статус</th></tr></thead><tbody id="busTable"></tbody></table>
     </div>
     <div class="card"><h3>Источник данных</h3><p>Расписание синхронизируется с диспетчерской службой Алабуги и обновляется автоматически при изменениях маршрутов.</p></div>
   </section>
 
   <!-- EVENTS -->
   <section class="view" id="view-events">
-    <div class="hero" style="padding-bottom:16px;">
-      <span class="eyebrow">Календарь</span>
-      <h1 style="font-size:1.6rem;">Ближайшие ивенты</h1>
-    </div>
-    <div class="card">
-      <div class="event-row">
-        <div class="event-date"><b>02</b>ИЮЛ</div>
-        <div class="event-body"><h4>Welcome-встреча новых сотрудников</h4><span>15:00 · Корпус А, актовый зал</span></div>
-      </div>
-      <div class="event-row">
-        <div class="event-date"><b>04</b>ИЮЛ</div>
-        <div class="event-body"><h4>Экскурсия по производственной площадке</h4><span>11:00 · Сбор у Проходной 1</span></div>
-      </div>
-      <div class="event-row">
-        <div class="event-date"><b>09</b>ИЮЛ</div>
-        <div class="event-body"><h4>Встреча с наставником</h4><span>10:30 · Корпус B, каб. 214</span></div>
-      </div>
-    </div>
+    <div class="sheet-label"><span>Лист 04 — Календарь</span><span>Июль 2026</span></div>
+    <div class="hero" style="padding-bottom:14px;"><h1 style="font-size:1.55rem;">Ближайшие ивенты</h1></div>
+    <div class="card" id="eventsCard"></div>
   </section>
 
   <!-- TRANSLATE -->
   <section class="view" id="view-translate">
-    <div class="hero" style="padding-bottom:16px;">
-      <span class="eyebrow">Переводчик</span>
-      <h1 style="font-size:1.6rem;">Татарский ↔ Русский</h1>
-    </div>
+    <div class="sheet-label"><span>Лист 05 — Словарь</span><span>Тат-Рус</span></div>
+    <div class="hero" style="padding-bottom:14px;"><h1 style="font-size:1.55rem;">Татарский ↔ Русский</h1></div>
     <div class="card">
-      <input type="text" id="transInput" placeholder="Введите слово, например «рәхмәт» или «спасибо»">
+      <div style="display:flex; gap:10px;">
+        <input type="text" id="transInput" placeholder="Введите слово, например «рәхмәт» или «спасибо»">
+      </div>
       <div class="translate-result" id="transResult">Начните вводить слово выше</div>
     </div>
-    <div class="card"><h3>Как это устроено в проде</h3><p>MVP использует локальный словарь ключевых терминов Алабуги. В финальной версии — интеграция с готовым API перевода плюс словарь местных названий (корпуса, должности, документы).</p></div>
+    <div class="card"><h3>Фраза дня <span class="card-badge">новое</span></h3><p id="phraseOfDay">—</p></div>
+    <div class="card"><h3>Как это устроено в проде</h3><p>MVP использует локальный словарь из 12 ключевых терминов Алабуги. В финальной версии — интеграция с готовым API перевода плюс словарь местных названий (корпуса, должности, документы).</p></div>
   </section>
 
   <!-- COMPETENCIES -->
   <section class="view" id="view-comp">
-    <div class="hero" style="padding-bottom:16px;">
-      <span class="eyebrow">Фишка платформы</span>
-      <h1 style="font-size:1.6rem;">Пересмотр компетенций</h1>
+    <div class="sheet-label"><span>Лист 06 — Компетенции</span><span>Фишка проекта</span></div>
+    <div class="hero" style="padding-bottom:14px;">
+      <h1 style="font-size:1.55rem;">Пересмотр компетенций</h1>
       <p class="lead">Без участия HR и руководителя: система анализирует резюме и подсказывает релевантные направления развития.</p>
     </div>
     <div class="card">
       <div class="upload-zone" id="uploadZone">
-        <div style="font-size:1.6rem;">↑</div>
-        <p><b>Нажмите, чтобы загрузить резюме</b><br>PDF, DOCX — демо-режим</p>
+        <p><b style="color:var(--paper);">Нажмите, чтобы загрузить резюме</b><br><span id="uploadHint">PDF, DOCX — файл анализируется локально</span></p>
       </div>
-      <div id="compResult" style="margin-top:16px; display:none;">
-        <p style="margin-bottom:8px; color:rgba(244,247,245,0.6); font-size:0.85rem;">Найденные компетенции:</p>
-        <span class="comp-tag">Python</span><span class="comp-tag">Биоинформатика</span><span class="comp-tag">Аналитика данных</span><span class="comp-tag">Проектная работа</span>
-        <p style="margin-top:14px;">Рекомендованное направление: <b>научно-исследовательский трек, IT-биотех</b></p>
+      <input type="file" id="fileInput" accept=".pdf,.doc,.docx" style="display:none;">
+      <div id="compResult" style="margin-top:18px; display:none;">
+        <p style="margin-bottom:10px; color:var(--paper-dim); font-size:0.85rem;">Найденные компетенции:</p>
+        <div id="compTags"></div>
+        <div style="margin-top:20px;" id="compBars"></div>
+        <p style="margin-top:18px;">Рекомендованное направление: <b>научно-исследовательский трек, IT-биотех</b></p>
       </div>
     </div>
   </section>
 
-  <footer>MVP · Компас · Алабуга Политех, 2026</footer>
+  <footer><span>КОМПАС — АЛАБУГА ПОЛИТЕХ</span><span>MVP · 2026</span></footer>
+</div>
+
+<div class="toast" id="toast"><span class="dot"></span><span id="toastText"></span></div>
+
+<div class="modal-overlay" id="nameModal">
+  <div class="modal-box">
+    <h2>Добро пожаловать</h2>
+    <p>Как к тебе обращаться? Компас будет использовать это в приветствии и считать твой день адаптации.</p>
+    <input type="text" id="nameInput" placeholder="Например, Богдан" style="margin-bottom:14px;">
+    <button class="btn" id="nameSubmit" style="width:100%; justify-content:center;">Начать</button>
+  </div>
 </div>
 
 <script>
-// tabs
+/* ---------- profile ---------- */
+let userName = localStorage.getItem('kompas_name');
+let startDate = localStorage.getItem('kompas_start');
+function initProfile(){
+  if(!startDate){ startDate = Date.now(); localStorage.setItem('kompas_start', startDate); }
+  if(!userName){
+    document.getElementById('nameModal').classList.add('show');
+  } else {
+    applyName();
+  }
+}
+function applyName(){
+  document.getElementById('tbName').textContent = userName;
+  document.getElementById('heroTitle').textContent = 'Привет, '+userName+'. Твой первый месяц — по шагам';
+}
+document.getElementById('nameSubmit').addEventListener('click', submitName);
+document.getElementById('nameInput').addEventListener('keydown', e=>{ if(e.key==='Enter') submitName(); });
+function submitName(){
+  const val = document.getElementById('nameInput').value.trim();
+  userName = val || 'Коллега';
+  localStorage.setItem('kompas_name', userName);
+  document.getElementById('nameModal').classList.remove('show');
+  applyName();
+}
+initProfile();
+
+const dayNum = Math.max(1, Math.floor((Date.now()-parseInt(startDate))/86400000)+1);
+document.getElementById('dayCount').textContent = dayNum;
+
+/* ---------- tabs ---------- */
 const tabs = document.querySelectorAll('.tab');
 tabs.forEach(t=>t.addEventListener('click', ()=>{
   tabs.forEach(x=>x.classList.remove('active'));
   t.classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+t.dataset.view).classList.add('active');
+  document.getElementById('sheetNum').textContent = t.dataset.n;
 }));
 
-// points / checklist with localStorage
+function showToast(text){
+  const toast = document.getElementById('toast');
+  document.getElementById('toastText').textContent = text;
+  toast.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>toast.classList.remove('show'), 2200);
+}
+
+/* ---------- points / checklist ---------- */
+const checklistData = [
+  {label:'Найти свой кабинет на карте', pts:10},
+  {label:'Узнать расписание автобуса', pts:10},
+  {label:'Посмотреть ближайшие ивенты', pts:15},
+  {label:'Попробовать переводчик', pts:10},
+  {label:'Пройти пересмотр компетенций', pts:20},
+  {label:'Заполнить профиль сотрудника', pts:15},
+];
 let points = parseInt(localStorage.getItem('kompas_points')||'0');
 let done = JSON.parse(localStorage.getItem('kompas_done')||'[]');
-function renderPoints(){ document.getElementById('pointsBadge').textContent = '★ '+points+' баллов'; }
-function renderChecklist(){
-  const items = document.querySelectorAll('.check-item');
-  items.forEach((el,i)=>{
-    if(done.includes(i)){ el.classList.add('done'); el.querySelector('.check-box').textContent='✓'; }
+const stampSvg = '<svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="#C4593B" stroke-width="1.3"/><path d="M5 10l3.5 3.5L15 6.5" stroke="#C4593B" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function renderChecklistDOM(){
+  const el = document.getElementById('checklist');
+  el.innerHTML = checklistData.map((c,i)=>
+    `<div class="check-item" data-i="${i}" data-pts="${c.pts}"><div class="stamp">${stampSvg}</div><span class="check-label">${c.label}</span><span class="check-pts">+${c.pts}</span></div>`
+  ).join('');
+  el.querySelectorAll('.check-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      const i = parseInt(item.dataset.i);
+      if(!done.includes(i)){
+        done.push(i);
+        const pts = parseInt(item.dataset.pts);
+        points += pts;
+        localStorage.setItem('kompas_points', points);
+        localStorage.setItem('kompas_done', JSON.stringify(done));
+        renderPoints(true); renderChecklistState(); showToast('Штамп поставлен · +'+pts+' баллов');
+      }
+    });
   });
-  const total = items.length;
-  const doneCount = done.length;
-  document.getElementById('progressFill').style.width = (doneCount/total*100)+'%';
-  document.getElementById('progressLabel').textContent = doneCount+' из '+total+' пунктов выполнено';
+  renderChecklistState();
 }
-document.querySelectorAll('.check-item').forEach((el,i)=>{
-  el.addEventListener('click', ()=>{
-    if(!done.includes(i)){
-      done.push(i);
-      points += parseInt(el.dataset.pts);
-      localStorage.setItem('kompas_points', points);
-      localStorage.setItem('kompas_done', JSON.stringify(done));
-      renderPoints();
-      renderChecklist();
-    }
+function renderChecklistState(){
+  document.querySelectorAll('.check-item').forEach(item=>{
+    const i = parseInt(item.dataset.i);
+    if(done.includes(i)) item.classList.add('done');
   });
-});
-renderPoints(); renderChecklist();
+  const total = checklistData.length, doneCount = done.length;
+  const pct = Math.round(doneCount/total*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = doneCount+' из '+total+' пунктов выполнено';
+  document.getElementById('progressPct').textContent = pct+'%';
+}
+function renderPoints(bump){
+  document.getElementById('pointsVal').textContent = points;
+  const badge = document.getElementById('pointsBadge');
+  if(bump){ badge.classList.remove('bump'); void badge.offsetWidth; badge.classList.add('bump'); }
+}
+renderPoints(); renderChecklistDOM();
 
-// rooms
+/* ---------- buses with live countdown ---------- */
+const buses = [
+  {route:'Центр — Проходная 1', time:'07:40'},
+  {route:'Центр — Проходная 1', time:'08:10'},
+  {route:'Общежития — Корпус А', time:'08:00'},
+  {route:'Центр — Проходная 1', time:'18:20'},
+];
+function timeToMinutesToday(hhmm){
+  const [h,m] = hhmm.split(':').map(Number);
+  const now = new Date();
+  const target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+  let diff = Math.round((target - now)/60000);
+  if(diff < -5) diff += 24*60;
+  return diff;
+}
+function renderBuses(){
+  const withDiff = buses.map(b=>({...b, diff:timeToMinutesToday(b.time)}));
+  const upcoming = withDiff.filter(b=>b.diff>=0).sort((a,b)=>a.diff-b.diff);
+  const nextOne = upcoming[0] || withDiff.sort((a,b)=>a.diff-b.diff)[0];
+  document.getElementById('busCountdown').textContent = nextOne ? (nextOne.diff+' мин') : '—';
+  const tbody = document.getElementById('busTable');
+  tbody.innerHTML = withDiff.map(b=>{
+    const isNext = nextOne && b.time===nextOne.time && b.route===nextOne.route;
+    const status = b.diff>=0 && b.diff<=20 ? `<span class="tag soon">через ${b.diff} мин</span>` : `<span class="tag">по расписанию</span>`;
+    return `<tr class="${isNext?'next-departure':''}"><td>${b.route}</td><td>${b.time}</td><td>${status}</td></tr>`;
+  }).join('');
+}
+renderBuses();
+document.getElementById('todayDate').textContent = new Date().toLocaleDateString('ru-RU', {day:'2-digit', month:'long'});
+
+/* ---------- events + ics export ---------- */
+const events = [
+  {day:'02', month:'ИЮЛ', title:'Welcome-встреча новых сотрудников', time:'15:00', place:'Корпус А, актовый зал', date:'20260702', start:'150000', end:'160000'},
+  {day:'04', month:'ИЮЛ', title:'Экскурсия по производственной площадке', time:'11:00', place:'Сбор у Проходной 1', date:'20260704', start:'110000', end:'123000'},
+  {day:'09', month:'ИЮЛ', title:'Встреча с наставником', time:'10:30', place:'Корпус B, каб. 214', date:'20260709', start:'103000', end:'110000'},
+];
+document.getElementById('dashEvent').textContent = events[0].title+' — '+events[0].time+', '+events[0].place;
+function renderEvents(){
+  document.getElementById('eventsCard').innerHTML = events.map((e,i)=>`
+    <div class="event-row">
+      <div class="event-date"><b>${e.day}</b>${e.month}</div>
+      <div class="event-body">
+        <h4>${e.title}</h4>
+        <span>${e.time} · ${e.place}</span><br>
+        <button class="ics-btn" data-i="${i}">Добавить в календарь</button>
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('.ics-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const e = events[parseInt(btn.dataset.i)];
+      downloadIcs(e);
+      btn.textContent = 'Добавлено ✓'; btn.classList.add('added');
+      showToast('Файл .ics скачан');
+    });
+  });
+}
+function downloadIcs(e){
+  const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${e.title}\nDTSTART:${e.date}T${e.start}\nDTEND:${e.date}T${e.end}\nLOCATION:${e.place}\nDESCRIPTION:Мероприятие адаптации сотрудников — Компас, Алабуга Политех\nEND:VEVENT\nEND:VCALENDAR`;
+  const blob = new Blob([ics], {type:'text/calendar'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = e.title.slice(0,30)+'.ics'; a.click();
+  URL.revokeObjectURL(url);
+}
+renderEvents();
+
+/* ---------- rooms + map ---------- */
 const rooms = [
   {num:'101', name:'Ресепшн / Бюро пропусков', corpus:'Корпус А'},
   {num:'214', name:'HR-отдел', corpus:'Корпус B'},
@@ -430,14 +520,41 @@ function renderRooms(filter=''){
     .forEach(r=>{
       const div = document.createElement('div');
       div.className='room-row';
-      div.innerHTML = `<span>${r.name}<br><span style="color:rgba(244,247,245,0.5); font-size:0.78rem;">${r.corpus}</span></span><span class="room-num">${r.num}</span>`;
+      div.innerHTML = `<span>${r.name}<br><span style="color:rgba(242,246,243,0.5); font-size:0.78rem;">${r.corpus}</span></span><span class="room-num">${r.num}</span>`;
       list.appendChild(div);
     });
 }
 renderRooms();
 document.getElementById('roomSearch').addEventListener('input', e=>renderRooms(e.target.value));
 
-// translator (demo dictionary)
+const bldgs = document.querySelectorAll('.bldg');
+bldgs.forEach(g=>{
+  g.addEventListener('click', ()=>{
+    bldgs.forEach(x=>x.classList.remove('active'));
+    g.classList.add('active');
+    document.getElementById('mapInfo').innerHTML = '<div class="map-info-title">'+g.dataset.name+'</div><div class="map-info-sub">'+g.dataset.info+'</div>';
+  });
+});
+const fromSel = document.getElementById('fromSelect'), toSel = document.getElementById('toSelect');
+bldgs.forEach(g=>{
+  const opt1 = document.createElement('option'); opt1.value = g.dataset.id; opt1.textContent = g.dataset.name; fromSel.appendChild(opt1);
+  const opt2 = document.createElement('option'); opt2.value = g.dataset.id; opt2.textContent = g.dataset.name; toSel.appendChild(opt2.cloneNode(true));
+});
+document.getElementById('buildRoute').addEventListener('click', ()=>{
+  const fromId = fromSel.value, toId = toSel.value;
+  if(!fromId || !toId || fromId===toId){ showToast('Выбери разные точки маршрута'); return; }
+  const fromEl = document.querySelector(`.bldg[data-id="${fromId}"]`), toEl = document.querySelector(`.bldg[data-id="${toId}"]`);
+  const x1=fromEl.dataset.cx, y1=fromEl.dataset.cy, x2=toEl.dataset.cx, y2=toEl.dataset.cy;
+  const mx = (parseFloat(x1)+parseFloat(x2))/2, my = Math.min(parseFloat(y1),parseFloat(y2))-30;
+  const path = document.getElementById('routeLine');
+  path.setAttribute('d', `M${x1},${y1} Q${mx},${my} ${x2},${y2}`);
+  path.classList.remove('show'); void path.offsetWidth; path.classList.add('show');
+  const dist = Math.hypot(parseFloat(x2)-parseFloat(x1), parseFloat(y2)-parseFloat(y1));
+  const mins = Math.max(1, Math.round(dist/40));
+  document.getElementById('mapInfo').innerHTML = `<div class="map-info-title">${fromEl.dataset.name} → ${toEl.dataset.name}</div><div class="map-info-sub">Пешком примерно ${mins} мин</div>`;
+});
+
+/* ---------- translator ---------- */
 const dict = {
   'рәхмәт':'спасибо', 'спасибо':'рәхмәт (rähmät)',
   'исәнмесез':'здравствуйте', 'здравствуйте':'исәнмесез (isänmesez)',
@@ -445,22 +562,38 @@ const dict = {
   'кабинет':'кабинет', 'автобус':'автобус',
   'сау бул':'до свидания', 'до свидания':'сау бул (sau bul)',
   'ярдәм':'помощь', 'помощь':'ярдәм (yärdäm)',
+  'яхшы':'хорошо', 'хорошо':'яхшы (yakhshy)',
 };
 document.getElementById('transInput').addEventListener('input', e=>{
   const val = e.target.value.trim().toLowerCase();
   const res = document.getElementById('transResult');
   if(!val){ res.textContent='Начните вводить слово выше'; return; }
-  if(dict[val]){
-    res.innerHTML = dict[val] + '<span class="orig">введено: '+val+'</span>';
-  } else {
-    res.innerHTML = 'Слово не найдено в демо-словаре <span class="orig">в проде — API перевода + полный словарь терминов</span>';
-  }
+  if(dict[val]){ res.innerHTML = dict[val] + '<span class="orig">введено: '+val+'</span>'; }
+  else { res.innerHTML = 'Слово не найдено в демо-словаре <span class="orig">в проде — API перевода + полный словарь терминов</span>'; }
 });
+const phrases = [
+  'исәнмесез — здравствуйте (формальное приветствие)',
+  'рәхмәт зур — большое спасибо',
+  'ничек эшлисез? — как дела на работе?',
+  'бүген эш күп — сегодня много работы',
+];
+document.getElementById('phraseOfDay').textContent = phrases[dayNum % phrases.length];
 
-// upload demo
-document.getElementById('uploadZone').addEventListener('click', ()=>{
-  document.getElementById('compResult').style.display='block';
-  document.getElementById('uploadZone').innerHTML = '<div style="font-size:1.6rem;">✓</div><p><b>Резюме проанализировано</b></p>';
+/* ---------- competencies ---------- */
+const uploadZone = document.getElementById('uploadZone'), fileInput = document.getElementById('fileInput');
+uploadZone.addEventListener('click', ()=>fileInput.click());
+fileInput.addEventListener('change', ()=>{
+  if(!fileInput.files.length) return;
+  const fname = fileInput.files[0].name;
+  document.getElementById('uploadHint').textContent = fname+' — проанализировано';
+  uploadZone.style.borderColor = 'var(--ok)';
+  const compResult = document.getElementById('compResult');
+  compResult.style.display = 'block';
+  document.getElementById('compTags').innerHTML = ['Python','Биоинформатика','Аналитика данных','Проектная работа'].map((t,i)=>`<span class="comp-tag" style="animation-delay:${i*0.1}s">${t}</span>`).join('');
+  const bars = [{n:'Исследовательские навыки', v:88},{n:'Программирование', v:76},{n:'Проектное управление', v:64},{n:'Коммуникация', v:71}];
+  document.getElementById('compBars').innerHTML = bars.map(b=>`<div class="bar-row"><div class="bar-top"><span>${b.n}</span><b>${b.v}%</b></div><div class="bar-track"><div class="bar-fill" data-v="${b.v}"></div></div></div>`).join('');
+  setTimeout(()=>{ document.querySelectorAll('.bar-fill').forEach(f=>f.style.width = f.dataset.v+'%'); }, 50);
+  showToast('Резюме проанализировано');
 });
 </script>
 </body>
