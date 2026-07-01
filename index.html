@@ -1,24 +1,467 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#7C3AED" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="LifeTracker" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <title>LifeTracker</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Компас — платформа адаптации | Алабуга Политех</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0F2E42;
+    --slate:#1B3F51;
+    --line:#6FA8B5;
+    --paper:#F4F7F5;
+    --amber:#E8A33D;
+    --ink:#12232B;
+    --ok:#6FBF8B;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--navy);
+    color:var(--paper);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* blueprint grid background */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(111,168,181,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(111,168,181,0.08) 1px, transparent 1px);
+    background-size:32px 32px;
+    pointer-events:none;
+    z-index:0;
+  }
+  .wrap{position:relative; z-index:1; max-width:920px; margin:0 auto; padding:0 20px 80px;}
+
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:24px 0 18px;
+    border-bottom:1px solid rgba(111,168,181,0.25);
+    margin-bottom:8px;
+  }
+  .logo{display:flex; align-items:center; gap:10px;}
+  .logo-mark{width:34px; height:34px; flex-shrink:0;}
+  .logo-text{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.15rem; letter-spacing:0.02em;}
+  .logo-sub{font-family:'IBM Plex Mono', monospace; font-size:0.62rem; color:var(--line); letter-spacing:0.08em; text-transform:uppercase;}
+  .points{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.78rem;
+    background:rgba(232,163,61,0.14);
+    border:1px solid rgba(232,163,61,0.4);
+    color:var(--amber);
+    padding:6px 12px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+
+  nav{
+    display:flex; gap:4px; overflow-x:auto;
+    padding:16px 0 4px;
+    margin-bottom:20px;
+    -ms-overflow-style:none; scrollbar-width:none;
+  }
+  nav::-webkit-scrollbar{display:none;}
+  .tab{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.74rem;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    color:var(--line);
+    background:transparent;
+    border:1px solid rgba(111,168,181,0.3);
+    padding:8px 14px;
+    border-radius:999px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all 0.2s ease;
+  }
+  .tab:hover{border-color:var(--line); color:var(--paper);}
+  .tab.active{background:var(--paper); color:var(--navy); border-color:var(--paper); font-weight:500;}
+
+  .view{display:none; animation:fadeIn 0.35s ease;}
+  .view.active{display:block;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  .hero{
+    display:flex; flex-direction:column; gap:6px;
+    padding:8px 0 28px;
+  }
+  .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--line); letter-spacing:0.1em; text-transform:uppercase;}
+  h1{font-family:'Space Grotesk', sans-serif; font-size:2rem; font-weight:600; line-height:1.15; max-width:600px;}
+  .lead{color:rgba(244,247,245,0.7); font-size:0.95rem; max-width:520px; margin-top:6px;}
+
+  .route-svg{width:100%; height:auto; margin:20px 0 8px;}
+  .route-path{
+    fill:none; stroke:var(--amber); stroke-width:2.5; stroke-linecap:round;
+    stroke-dasharray:600; stroke-dashoffset:600;
+    animation:draw 2.4s ease forwards 0.3s;
+  }
+  @keyframes draw{to{stroke-dashoffset:0;}}
+
+  .card{
+    background:var(--slate);
+    border:1px solid rgba(111,168,181,0.2);
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:14px;
+  }
+  .card h3{font-family:'Space Grotesk', sans-serif; font-size:1.05rem; font-weight:600; margin-bottom:10px;}
+  .card p{color:rgba(244,247,245,0.72); font-size:0.9rem; line-height:1.5;}
+
+  .checklist{display:flex; flex-direction:column; gap:0;}
+  .check-item{
+    display:flex; align-items:center; gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid rgba(111,168,181,0.15);
+    cursor:pointer;
+  }
+  .check-item:last-child{border-bottom:none;}
+  .check-box{
+    width:22px; height:22px; border-radius:6px;
+    border:1.5px solid var(--line);
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.75rem;
+    transition:all 0.2s ease;
+  }
+  .check-item.done .check-box{background:var(--ok); border-color:var(--ok); color:var(--navy);}
+  .check-item.done .check-label{text-decoration:line-through; color:rgba(244,247,245,0.45);}
+  .check-label{font-size:0.9rem;}
+  .check-pts{margin-left:auto; font-family:'IBM Plex Mono', monospace; font-size:0.7rem; color:var(--amber);}
+
+  .progress-bar{height:6px; background:rgba(111,168,181,0.18); border-radius:999px; overflow:hidden; margin:12px 0 4px;}
+  .progress-fill{height:100%; background:var(--amber); border-radius:999px; transition:width 0.4s ease; width:0%;}
+
+  .grid-2{display:grid; grid-template-columns:1fr; gap:12px;}
+  @media(min-width:640px){.grid-2{grid-template-columns:1fr 1fr;}}
+
+  table{width:100%; border-collapse:collapse; font-size:0.86rem;}
+  th{text-align:left; font-family:'IBM Plex Mono', monospace; font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--line); padding:8px 6px; border-bottom:1px solid rgba(111,168,181,0.25);}
+  td{padding:10px 6px; border-bottom:1px solid rgba(111,168,181,0.1);}
+  .tag{display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:0.68rem; padding:2px 8px; border-radius:999px; background:rgba(111,168,181,0.15); color:var(--line);}
+
+  .room-list{display:flex; flex-direction:column; gap:8px;}
+  .room-row{display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:rgba(111,168,181,0.06); border-radius:10px; font-size:0.88rem;}
+  .room-num{font-family:'IBM Plex Mono', monospace; color:var(--amber); font-weight:500;}
+
+  input[type=text], select{
+    width:100%;
+    background:rgba(244,247,245,0.06);
+    border:1px solid rgba(111,168,181,0.3);
+    color:var(--paper);
+    padding:11px 14px;
+    border-radius:10px;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.92rem;
+    outline:none;
+  }
+  input[type=text]:focus, select:focus{border-color:var(--amber);}
+  input[type=text]::placeholder{color:rgba(244,247,245,0.35);}
+
+  .translate-result{
+    margin-top:14px; padding:14px 16px; background:rgba(232,163,61,0.1);
+    border:1px solid rgba(232,163,61,0.3); border-radius:10px;
+    font-size:1rem; min-height:20px;
+  }
+  .translate-result .orig{font-family:'IBM Plex Mono', monospace; font-size:0.72rem; color:var(--line); display:block; margin-top:4px;}
+
+  .btn{
+    display:inline-block;
+    background:var(--amber); color:var(--ink);
+    font-weight:600; font-size:0.9rem;
+    border:none; padding:12px 22px; border-radius:10px;
+    cursor:pointer; font-family:'IBM Plex Sans', sans-serif;
+    transition:transform 0.15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn:active{transform:translateY(0);}
+
+  .upload-zone{
+    border:1.5px dashed rgba(111,168,181,0.4);
+    border-radius:var(--radius);
+    padding:32px 20px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color 0.2s ease;
+  }
+  .upload-zone:hover{border-color:var(--amber);}
+  .upload-zone p{color:rgba(244,247,245,0.6); font-size:0.85rem; margin-top:6px;}
+
+  .comp-tag{
+    display:inline-block; margin:4px 6px 0 0; padding:6px 12px;
+    background:rgba(111,191,139,0.15); border:1px solid rgba(111,191,139,0.35);
+    color:var(--ok); border-radius:999px; font-size:0.82rem;
+  }
+
+  .event-row{display:flex; gap:14px; padding:14px 0; border-bottom:1px solid rgba(111,168,181,0.15);}
+  .event-row:last-child{border-bottom:none;}
+  .event-date{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--amber);
+    flex-shrink:0; width:56px; text-align:center; line-height:1.3; padding-top:2px;
+  }
+  .event-date b{display:block; font-size:1.1rem; font-family:'Space Grotesk', sans-serif; color:var(--paper);}
+  .event-body h4{font-size:0.92rem; font-weight:500; margin-bottom:2px;}
+  .event-body span{font-size:0.78rem; color:rgba(244,247,245,0.55);}
+
+  footer{
+    text-align:center; padding-top:24px; margin-top:10px;
+    border-top:1px solid rgba(111,168,181,0.15);
+    font-family:'IBM Plex Mono', monospace; font-size:0.7rem; color:rgba(111,168,181,0.6);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <svg class="logo-mark" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" stroke="#E8A33D" stroke-width="2"/>
+        <path d="M20 8 L24 20 L20 32 L16 20 Z" fill="#E8A33D"/>
+        <circle cx="20" cy="20" r="2.5" fill="#0F2E42"/>
+      </svg>
+      <div>
+        <div class="logo-text">Компас</div>
+        <div class="logo-sub">Alabuga Politech · Onboarding</div>
+      </div>
+    </div>
+    <div class="points" id="pointsBadge">★ 0 баллов</div>
+  </header>
+
+  <nav id="tabs">
+    <button class="tab active" data-view="dashboard">Дашборд</button>
+    <button class="tab" data-view="nav">Навигация</button>
+    <button class="tab" data-view="logistics">Логистика</button>
+    <button class="tab" data-view="events">Ивенты</button>
+    <button class="tab" data-view="translate">Переводчик</button>
+    <button class="tab" data-view="comp">Компетенции</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <section class="view active" id="view-dashboard">
+    <div class="hero">
+      <span class="eyebrow">Добро пожаловать в Алабуга Политех</span>
+      <h1>Твой первый месяц — по шагам, а не наугад</h1>
+      <p class="lead">Компас собирает всё, что нужно новому сотруднику на старте: маршруты, расписание, ивенты и перевод — в одном месте, с прогрессом и баллами.</p>
+    </div>
+
+    <svg class="route-svg" viewBox="0 0 880 140" xmlns="http://www.w3.org/2000/svg">
+      <path class="route-path" d="M20,110 C120,110 140,30 240,30 C340,30 340,100 440,100 C540,100 540,40 640,40 C740,40 760,90 860,70" />
+      <circle cx="20" cy="110" r="5" fill="#F4F7F5"/>
+      <circle cx="240" cy="30" r="4" fill="#6FA8B5"/>
+      <circle cx="440" cy="100" r="4" fill="#6FA8B5"/>
+      <circle cx="640" cy="40" r="4" fill="#6FA8B5"/>
+      <circle cx="860" cy="70" r="5" fill="#E8A33D"/>
+    </svg>
+
+    <div class="card">
+      <h3>Чек-лист адаптации</h3>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <p id="progressLabel" style="margin-bottom:12px;">0 из 6 пунктов выполнено</p>
+      <div class="checklist" id="checklist">
+        <div class="check-item" data-pts="10"><div class="check-box"></div><span class="check-label">Найти свой кабинет на карте</span><span class="check-pts">+10</span></div>
+        <div class="check-item" data-pts="10"><div class="check-box"></div><span class="check-label">Узнать расписание автобуса</span><span class="check-pts">+10</span></div>
+        <div class="check-item" data-pts="15"><div class="check-box"></div><span class="check-label">Посмотреть ближайшие ивенты</span><span class="check-pts">+15</span></div>
+        <div class="check-item" data-pts="10"><div class="check-box"></div><span class="check-label">Попробовать переводчик</span><span class="check-pts">+10</span></div>
+        <div class="check-item" data-pts="20"><div class="check-box"></div><span class="check-label">Пройти пересмотр компетенций</span><span class="check-pts">+20</span></div>
+        <div class="check-item" data-pts="15"><div class="check-box"></div><span class="check-label">Заполнить профиль сотрудника</span><span class="check-pts">+15</span></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card"><h3>Сегодня</h3><p>Автобус от главной проходной — через 12 минут. Ближайший ивент: приветственная встреча, 15:00, Корпус А.</p></div>
+      <div class="card"><h3>Совет дня</h3><p>Загрузи резюме в разделе «Компетенции» — система подберёт направления развития без участия HR.</p></div>
+    </div>
+  </section>
+
+  <!-- NAVIGATION -->
+  <section class="view" id="view-nav">
+    <div class="hero" style="padding-bottom:16px;">
+      <span class="eyebrow">Навигация по территории</span>
+      <h1 style="font-size:1.6rem;">Кабинеты и корпуса</h1>
+    </div>
+    <div class="card">
+      <input type="text" id="roomSearch" placeholder="Поиск кабинета, например 214 или HR" style="margin-bottom:14px;">
+      <div class="room-list" id="roomList"></div>
+    </div>
+    <div class="card">
+      <h3>Карта территории</h3>
+      <p>Векторные планы зданий (DWG/PDF) загружаются от администрации Алабуга Политех и рендерятся здесь как интерактивная схема с поиском по кабинетам.</p>
+    </div>
+  </section>
+
+  <!-- LOGISTICS -->
+  <section class="view" id="view-logistics">
+    <div class="hero" style="padding-bottom:16px;">
+      <span class="eyebrow">Логистика</span>
+      <h1 style="font-size:1.6rem;">Корпоративные автобусы</h1>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Маршрут</th><th>Отправление</th><th>Статус</th></tr></thead>
+        <tbody>
+          <tr><td>Центр — Проходная 1</td><td>07:40</td><td><span class="tag">по расписанию</span></td></tr>
+          <tr><td>Центр — Проходная 1</td><td>08:10</td><td><span class="tag">по расписанию</span></td></tr>
+          <tr><td>Общежития — Корпус А</td><td>08:00</td><td><span class="tag">по расписанию</span></td></tr>
+          <tr><td>Центр — Проходная 1</td><td>18:20</td><td><span class="tag">по расписанию</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card"><h3>Источник данных</h3><p>Расписание синхронизируется с диспетчерской службой Алабуги и обновляется автоматически при изменениях маршрутов.</p></div>
+  </section>
+
+  <!-- EVENTS -->
+  <section class="view" id="view-events">
+    <div class="hero" style="padding-bottom:16px;">
+      <span class="eyebrow">Календарь</span>
+      <h1 style="font-size:1.6rem;">Ближайшие ивенты</h1>
+    </div>
+    <div class="card">
+      <div class="event-row">
+        <div class="event-date"><b>02</b>ИЮЛ</div>
+        <div class="event-body"><h4>Welcome-встреча новых сотрудников</h4><span>15:00 · Корпус А, актовый зал</span></div>
+      </div>
+      <div class="event-row">
+        <div class="event-date"><b>04</b>ИЮЛ</div>
+        <div class="event-body"><h4>Экскурсия по производственной площадке</h4><span>11:00 · Сбор у Проходной 1</span></div>
+      </div>
+      <div class="event-row">
+        <div class="event-date"><b>09</b>ИЮЛ</div>
+        <div class="event-body"><h4>Встреча с наставником</h4><span>10:30 · Корпус B, каб. 214</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRANSLATE -->
+  <section class="view" id="view-translate">
+    <div class="hero" style="padding-bottom:16px;">
+      <span class="eyebrow">Переводчик</span>
+      <h1 style="font-size:1.6rem;">Татарский ↔ Русский</h1>
+    </div>
+    <div class="card">
+      <input type="text" id="transInput" placeholder="Введите слово, например «рәхмәт» или «спасибо»">
+      <div class="translate-result" id="transResult">Начните вводить слово выше</div>
+    </div>
+    <div class="card"><h3>Как это устроено в проде</h3><p>MVP использует локальный словарь ключевых терминов Алабуги. В финальной версии — интеграция с готовым API перевода плюс словарь местных названий (корпуса, должности, документы).</p></div>
+  </section>
+
+  <!-- COMPETENCIES -->
+  <section class="view" id="view-comp">
+    <div class="hero" style="padding-bottom:16px;">
+      <span class="eyebrow">Фишка платформы</span>
+      <h1 style="font-size:1.6rem;">Пересмотр компетенций</h1>
+      <p class="lead">Без участия HR и руководителя: система анализирует резюме и подсказывает релевантные направления развития.</p>
+    </div>
+    <div class="card">
+      <div class="upload-zone" id="uploadZone">
+        <div style="font-size:1.6rem;">↑</div>
+        <p><b>Нажмите, чтобы загрузить резюме</b><br>PDF, DOCX — демо-режим</p>
+      </div>
+      <div id="compResult" style="margin-top:16px; display:none;">
+        <p style="margin-bottom:8px; color:rgba(244,247,245,0.6); font-size:0.85rem;">Найденные компетенции:</p>
+        <span class="comp-tag">Python</span><span class="comp-tag">Биоинформатика</span><span class="comp-tag">Аналитика данных</span><span class="comp-tag">Проектная работа</span>
+        <p style="margin-top:14px;">Рекомендованное направление: <b>научно-исследовательский трек, IT-биотех</b></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>MVP · Компас · Алабуга Политех, 2026</footer>
+</div>
+
+<script>
+// tabs
+const tabs = document.querySelectorAll('.tab');
+tabs.forEach(t=>t.addEventListener('click', ()=>{
+  tabs.forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+t.dataset.view).classList.add('active');
+}));
+
+// points / checklist with localStorage
+let points = parseInt(localStorage.getItem('kompas_points')||'0');
+let done = JSON.parse(localStorage.getItem('kompas_done')||'[]');
+function renderPoints(){ document.getElementById('pointsBadge').textContent = '★ '+points+' баллов'; }
+function renderChecklist(){
+  const items = document.querySelectorAll('.check-item');
+  items.forEach((el,i)=>{
+    if(done.includes(i)){ el.classList.add('done'); el.querySelector('.check-box').textContent='✓'; }
+  });
+  const total = items.length;
+  const doneCount = done.length;
+  document.getElementById('progressFill').style.width = (doneCount/total*100)+'%';
+  document.getElementById('progressLabel').textContent = doneCount+' из '+total+' пунктов выполнено';
+}
+document.querySelectorAll('.check-item').forEach((el,i)=>{
+  el.addEventListener('click', ()=>{
+    if(!done.includes(i)){
+      done.push(i);
+      points += parseInt(el.dataset.pts);
+      localStorage.setItem('kompas_points', points);
+      localStorage.setItem('kompas_done', JSON.stringify(done));
+      renderPoints();
+      renderChecklist();
+    }
+  });
+});
+renderPoints(); renderChecklist();
+
+// rooms
+const rooms = [
+  {num:'101', name:'Ресепшн / Бюро пропусков', corpus:'Корпус А'},
+  {num:'214', name:'HR-отдел', corpus:'Корпус B'},
+  {num:'118', name:'IT-поддержка', corpus:'Корпус А'},
+  {num:'305', name:'Конференц-зал «Челны»', corpus:'Корпус B'},
+  {num:'022', name:'Столовая', corpus:'Корпус С'},
+  {num:'410', name:'Лаборатория биоматериалов', corpus:'Корпус D'},
+];
+function renderRooms(filter=''){
+  const list = document.getElementById('roomList');
+  list.innerHTML = '';
+  rooms.filter(r=> (r.num+r.name+r.corpus).toLowerCase().includes(filter.toLowerCase()))
+    .forEach(r=>{
+      const div = document.createElement('div');
+      div.className='room-row';
+      div.innerHTML = `<span>${r.name}<br><span style="color:rgba(244,247,245,0.5); font-size:0.78rem;">${r.corpus}</span></span><span class="room-num">${r.num}</span>`;
+      list.appendChild(div);
+    });
+}
+renderRooms();
+document.getElementById('roomSearch').addEventListener('input', e=>renderRooms(e.target.value));
+
+// translator (demo dictionary)
+const dict = {
+  'рәхмәт':'спасибо', 'спасибо':'рәхмәт (rähmät)',
+  'исәнмесез':'здравствуйте', 'здравствуйте':'исәнмесез (isänmesez)',
+  'эш':'работа', 'работа':'эш (esh)',
+  'кабинет':'кабинет', 'автобус':'автобус',
+  'сау бул':'до свидания', 'до свидания':'сау бул (sau bul)',
+  'ярдәм':'помощь', 'помощь':'ярдәм (yärdäm)',
+};
+document.getElementById('transInput').addEventListener('input', e=>{
+  const val = e.target.value.trim().toLowerCase();
+  const res = document.getElementById('transResult');
+  if(!val){ res.textContent='Начните вводить слово выше'; return; }
+  if(dict[val]){
+    res.innerHTML = dict[val] + '<span class="orig">введено: '+val+'</span>';
+  } else {
+    res.innerHTML = 'Слово не найдено в демо-словаре <span class="orig">в проде — API перевода + полный словарь терминов</span>';
+  }
+});
+
+// upload demo
+document.getElementById('uploadZone').addEventListener('click', ()=>{
+  document.getElementById('compResult').style.display='block';
+  document.getElementById('uploadZone').innerHTML = '<div style="font-size:1.6rem;">✓</div><p><b>Резюме проанализировано</b></p>';
+});
+</script>
+</body>
 </html>
